@@ -1,0 +1,291 @@
+---
+title: "Vignette_hw2"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{vignette_hw2}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## 1) CASL 2.11 Exercises Problem Number 5
+
+\[
+y = \beta_o \space + \space \beta_1 \times x
+\]
+
+### Using the explicit formula for the inverse of 2-by-2 matrix, write down the least squares estimators for β_0^ and β_1^
+
+\[
+\hat{\beta} = ({X^T} X)^{-1}{X^T}Y, \space \space \space X \in \mathbb{R}^{n\times 2}
+\]
+
+#### a. Applying the general formula
+
+\[
+where \space A^{-1}, \space \space \space A \in \mathbb{R}^{2\times 2}
+\]
+
+\[
+A =
+\left[\begin{array}
+{rrr}
+a & b\\
+c & d\\
+\end{array}\right], \space \space \space
+A^{-1} = \frac{1}{ad-bc}
+\left[\begin{array}
+{rrr}
+d & -b\\
+-c & a\\
+\end{array}\right]
+\]
+
+#### b. Solution
+
+\[
+where \space ({X^T} X)^{-1} {X^T}Y,
+\space \space \space \mathbb{R}^{2 \times 1},
+\space \space \space \beta =
+\left[\begin{array}
+{rrr}
+\beta_0\\
+\beta_1\\
+\end{array}\right]
+\]
+
+\[
+{X^TX} =
+\left[\begin{array}
+{rrr}
+\space 1 ... 1 \space \space\\
+X_1...X_n \\
+\end{array}\right] \times
+\left[\begin{array}
+{rrr}
+1 \space \space \space X_1\\
+\space : \space \space : \space\\
+1 \space \space \space X_n
+\end{array}\right] =
+\left[\begin{array}
+{rrr}
+n &\sum{X_i} \space \space\\
+\sum{X_i} & \sum{X_i}^2 \\
+\end{array}\right]
+\]
+
+\[
+({X^T}X)^{-1} = \frac{1}{n \sum {{X_j}^2}-(\sum {X_i})^2} \space
+\left[\begin{array}
+{rrr}
+\sum{X_i}^2 &-\sum{X_i}\\
+-\sum{X_i} & n\\
+\end{array}\right]
+\]
+
+\[
+{X^T}Y =
+\left[\begin{array}
+{rrr}
+\space 1 ... 1 \space \space\\
+X_1...X_n \\
+\end{array}\right]
+\left[\begin{array}
+{rrr}
+Y_1\\
+\space \space : \space\\
+Y_n
+\end{array} \right] =
+\left[\begin{array}
+{rrr}
+\space \sum{Y_i} \space \space \\
+\sum{X_iY_i}\\
+\end{array}\right]
+\]
+
+\[
+2X^{T} X \hat{\beta} = 2X^{T} Y
+\]
+
+\[
+({X^T} X)^{-1} {X^T} X \hat{\beta} = (X^{T} X)^{-1}X^{T} Y
+\]
+
+
+\[
+\hat{\beta} =  ({X^T} X)^{-1} {X^T}Y
+\]
+
+
+\[
+\hat{\beta} = \frac{1}{n \sum {{X_j}^2}-(\sum {X_i})^2} \space
+\left[\begin{array}
+{rrr}
+\sum{X_i}^2 & -\sum{X_i}\\
+-\sum{X_i} & n\\
+\end{array}\right] \times
+\left[\begin{array}
+{rrr}
+\space \sum{Y_i} \space \space\\
+\sum{X_iY_i}\\
+\end{array}\right]
+\]
+
+\[
+=
+\frac{1}{n \sum {{X_j}^2}-(\sum {X_i})^2} \space
+\left[\begin{array}
+{rrr}
+\sum{X_i}^2 \sum{Y_i} \space - \space \sum{X_i} \sum{X_iY_i} \\
+-\sum{X_i} \sum{Y_i} \space + \space n\sum{X_iY_i} \space \space \space \space\\
+\end{array}\right]
+\]
+
+##### Explanation 
+##### Predict  that  X^{T}X  is  invertible,  then  the  estimated  coefficient  \hat{\beta}  is  a  fixed linear  combination  of  Y derived  by  X^{T}X^{-1}X^{T}. In order  to  minimize  the sum  of  residuals  over our  choice  parameter vector  \hat{\beta}, differentiating  with  respect  to  a  vector  with  p  independent paramenters.
+
+
+##  4) Section 2.8 of CASL 
+
+### a) Solution 
+\[
+A_V = Z, \space \space \space X \beta = Y
+\]
+
+\[
+\lVert \space {Y} - {X\beta} \space \lVert^2_2 \space = 0
+\]
+
+\[
+\frac {\lVert \space \hat{V} \space - \space V \space \lVert}{\lVert \space V \space \lVert \space} \le \frac {\lVert \space A(V -\hat{V}) \space \lVert}{\lVert \space A_V \space \lVert \space} \le \frac {C}{\lVert \space V \space \lVert \space}
+\]
+
+\[
+\lVert \space X (\beta \space - \space \hat{\beta}) \space \lVert \space \le C
+\]
+
+### b) Support Code 
+```{r }
+devtools::install_github("statsmaths/casl")
+library(casl)
+
+n <- 1000; p <- 25
+beta <- c(1, rep(0, p - 1))
+X <- matrix(rnorm(n * p), ncol = p)
+
+svals <- svd(X)$d
+max(svals) / min(svals)
+
+N <- 1e4; l2_errors <- rep(0, N)
+for (k in 1:N) {
+y <- X %*% beta + rnorm(n)
+betahat <- casl_ols_svd(X, y)
+l2_errors[k] <- sqrt(sum((betahat - beta)^2))
+}
+mean(l2_errors)
+
+alpha <- 0.001
+X[,1] <- X[,1] * alpha + X[,2] * (1 - alpha)
+svals <- svd(X)$d
+max(svals) / min(svals)
+
+N <- 1e4; l2_errors <- rep(0, N)
+for (k in 1:N) {
+y <- X %*% beta + rnorm(n)
+betahat <- solve(crossprod(X), crossprod(X, y))
+l2_errors[k] <- sqrt(sum((betahat - beta)^2))
+}
+mean(l2_errors)
+
+```
+### c) Explanation
+
+###### As shown with the above evidence, the condition number is an important player in numerical stability. Specifically, numerical instability highlights noise from arithemetic floating point and statistical error from noise in data. These have an inverse relationship with one another. 
+
+## 5) LASSO Penalty
+
+\[
+L=\frac{1}{2n} \space \lVert \space {Y} - {X\beta} \space \lVert^2_2  \space + \space {\lambda} \space \lVert \space {\beta} \space \lVert_1, \space Y\in \mathbb{R}^{n\times 1}, \space X\in \mathbb{R}^{n\times p}, \space \beta \in \mathbb{R}^{p \times 1} 
+\]
+
+\[
+|\space {X_j}^T{Y} \space| < n \lambda 
+\]
+
+#### a) Assumptions 
+
+\[
+({X}^T{X}) = I, \space X_j...X_p \space are \space independent 
+\]
+
+\[
+{X_j}^TY-n \lambda < 0, \space \hat{\beta}_{lasso_j} = 0 
+\]
+
+\[
+\frac{1}{2n} \space \lVert \space {X} - {Y\beta} \space \lVert^2_2  \space + \space {\lambda} {\beta}, \space \beta > 0
+\]
+
+#### b) Solution
+
+\[
+\frac{\delta L}{\delta \beta} = \frac{2}{2n} (-Y^T)(X - Y \beta) \space + \space \lambda = 0 
+\]
+
+\[
+= (-Y^T)(X - Y \beta) \space + \space \lambda = 0 
+\]
+
+\[
+= -Y^TX \space + Y^T Y \beta \space + n \lambda = 0 
+\]
+
+\[
+= Y^T Y \beta = Y^T X - n \lambda 
+\]
+
+\[
+\beta = (Y^T Y)^{-1}[Y^T X - n \lambda] 
+\]
+
+\[
+Y^T X - n \lambda = 
+\left[\begin{array}
+{rrr}
+...Y_1... \\
+...Y_0... \\
+...Y_p...
+\end{array}\right] 
+X-n 
+\left[\begin{array}
+{rrr}
+\lambda_1\\
+\space \space : \space\\
+\lambda_p
+\end{array}\right] =
+\left[\begin{array}
+{rrr}
+{Y_i}^T X - n \lambda\\
+\space : \space \space \space \space \space \space \space \\
+{Y_p}^T X - n \lambda
+\end{array}\right] 
+\]
+
+## Citations 
+
+###### Arnold, T., Kane, M., & Bryan, L. (2019). A Computational Approach to Statistical Learning.
+###### math mode—How to write Euclidean distance. (n.d.). Retrieved October 23, 2019, from TeX - LaTeX Stack Exchange website: https://tex.stackexchange.com/questions/70020/how-to-write-euclidean-distance
+###### Mathematics in R Markdown. (n.d.). Retrieved October 23, 2019, from https://www.calvin.edu/~rpruim/courses/s341/S17/from-class/MathinRmd.html
+##### Pimp my RMD: a few tips for R Markdown. (n.d.). Retrieved October 23, 2019, from https://holtzy.github.io/Pimp-my-rmd/
+###### Rmarkdown-cheatsheet-2.0. (n.d.). 2.
+###### Rmarkdown-reference. (2014). 5.
+###### Using R Markdown for Class Reports. (n.d.). Retrieved October 23, 2019, from https://www.stat.cmu.edu/~cshalizi/rmarkdown/#mark-up-markdown
+###### An Example R Markdown. (n.d.-b). Retrieved October 23, 2019, from http://www.statpower.net/Content/312/Lecture%20Slides/SampleMarkdown.html
+###### How It Works. (n.d.). Retrieved October 23, 2019, from https://rmarkdown.rstudio.com/lesson-2.html
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
